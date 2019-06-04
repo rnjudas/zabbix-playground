@@ -1,5 +1,7 @@
 ## 1. About
 
+Original Project can be found here: https://github.com/DRN88/zabbix-playground
+
 Automatically discovers your buckets in AWS S3 and then:
 Pulls 3 data:
 * StandardStorage type bucket size
