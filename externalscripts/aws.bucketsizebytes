@@ -2,34 +2,34 @@
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/s3-metricscollected.html
 if [ $# -eq 1 ]; then
   now=$(date +%s)
-  yesterday="$(echo "$now - 86400*2" | bc)"
+  yesterday="$(echo "$now - 86400*2" | $(which bc))"
   SIZE1="$($(which aws) cloudwatch get-metric-statistics \
     --namespace AWS/S3 \
-    --start-time `/bin/date -d @${yesterday} '+%FT00:01:00'` \
-    --end-time `/bin/date -d @${now} '+%FT%H:%M:%S'` \
+    --start-time `date -d @${yesterday} '+%FT00:01:00'` \
+    --end-time `date -d @${now} '+%FT%H:%M:%S'` \
     --period 86400 \
     --statistics Average \
     --metric-name BucketSizeBytes \
-    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=StandardStorage | $(which jq) '.Datapoints[0].Average' | /bin/sed 's/null/0/')"
+    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=StandardStorage | $(which jq) '.Datapoints[0].Average' | sed 's/null/0/')"
   SIZE2="$($(which aws) cloudwatch get-metric-statistics \
     --namespace AWS/S3 \
-    --start-time `/bin/date -d @${yesterday} '+%FT00:01:00'` \
-    --end-time `/bin/date -d @${now} '+%FT%H:%M:%S'` \
+    --start-time `date -d @${yesterday} '+%FT00:01:00'` \
+    --end-time `date -d @${now} '+%FT%H:%M:%S'` \
     --period 86400 \
     --statistics Average \
     --metric-name BucketSizeBytes \
-    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=StandardIAStorage | $(which jq) '.Datapoints[0].Average' | /bin/sed 's/null/0/')"
-  echo "${SIZE1} + ${SIZE2}" | /bin/bc
+    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=StandardIAStorage | $(which jq) '.Datapoints[0].Average' | sed 's/null/0/')"
+  echo "${SIZE1} + ${SIZE2}" | $(which bc)
 fi
 if [ $# -eq 2 ]; then
   now=$(date +%s)
-  yesterday="$(echo "$now - 86400*2" | bc)"
+  yesterday="$(echo "$now - 86400*2" | $(which bc))"
   $(which aws) cloudwatch get-metric-statistics \
     --namespace AWS/S3 \
-    --start-time `/bin/date -d @${yesterday} '+%FT00:01:00'` \
-    --end-time `/bin/date -d @${now} '+%FT%H:%M:%S'` \
+    --start-time `date -d @${yesterday} '+%FT00:01:00'` \
+    --end-time `date -d @${now} '+%FT%H:%M:%S'` \
     --period 86400 \
     --statistics Average \
     --metric-name BucketSizeBytes \
-    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=${2} | $(which jq) '.Datapoints[0].Average' | /bin/sed 's/null/0/'
+    --dimensions Name=BucketName,Value="${1}" Name=StorageType,Value=${2} | $(which jq) '.Datapoints[0].Average' | sed 's/null/0/'
 fi
